@@ -1,0 +1,18 @@
+@font-face {
+    font-family: "gamefont";
+    src: url("/fonts/gamefont.ttf");
+}
+
+#game-window {
+    border: 1px solid black;
+}
+
+body { 
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+#stats {
+    width: 100%;
+}
