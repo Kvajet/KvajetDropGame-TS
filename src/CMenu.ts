@@ -101,8 +101,6 @@ export class CMenu {
 
     Click( ev: MouseEvent ) {
         const state = this.DetectTextCollision( ev );
-        console.log( state );
-        console.log( `m_state: ${ this.m_state }` );
         switch( state ) {
             case MenuStates.MENU:
                 this.m_state = MenuStates.MENU;
