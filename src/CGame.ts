@@ -1,7 +1,13 @@
-import { V2 , CanvasData } from './interfaces'
-import { CLandingArea } from './CLandingArea'
-import { CBlockHandler } from './CBlockHandler'
+import { V2 , CanvasData } from './interfaces';
+import { CLandingArea } from './CLandingArea';
+import { CBlockHandler } from './CBlockHandler';
 import { CBackgroundHandler } from './CBackgroundHandler';
+import { CMenu } from './CMenu';
+
+enum GameState {
+    MENU = 0,
+    GAME
+};
 
 export class CGame {
 
@@ -12,7 +18,9 @@ export class CGame {
     private m_landingArea: CLandingArea;
     private m_blockHandler: CBlockHandler;
     private m_backgroundHandler: CBackgroundHandler;
-    private m_cData: CanvasData = { width : 0, height: 0 }
+    private m_cData: CanvasData = { width : 0, height: 0 };
+    private m_gameState: GameState = GameState.MENU;
+    private m_menu: CMenu;
 
     constructor() {
         const lfCanvas = document.getElementById( "game-window" );
@@ -30,6 +38,7 @@ export class CGame {
         this.m_blockHandler = new CBlockHandler( this.m_context );
         this.m_landingArea = new CLandingArea( this.m_context , this.m_blockHandler.m_currentBlock , this.m_blockHandler.m_scalecoef );
         this.m_backgroundHandler = new CBackgroundHandler( this.m_context );
+        this.m_menu = new CMenu( this.m_context );
 
         this.m_context.imageSmoothingEnabled = false;
 
@@ -42,14 +51,24 @@ export class CGame {
     }
 
     private ClickHandler = ( ev: MouseEvent ) => {
-        if( this.m_landingArea.Hit() ) {
-            this.m_blockHandler.NewBlock();
-            this.m_velocity.y *= -1;
-
-            this.m_velocity.x *= 1.1;
-            this.m_velocity.y *= 1.1;
-
-            this.m_backgroundHandler.HigherLevel( true );
+        switch( this.m_gameState ) {
+            case GameState.MENU:
+                if( this.m_menu.Click( ev ) )
+                    this.m_gameState = GameState.GAME;
+                break;
+            case GameState.GAME:
+                if( this.m_landingArea.Hit() ) {
+                    this.m_blockHandler.NewBlock();
+                    this.m_velocity.y *= -1;
+        
+                    this.m_velocity.x *= 1.1;
+                    this.m_velocity.y *= 1.1;
+        
+                    this.m_backgroundHandler.HigherLevel( true );
+                }
+                break;
+            default: 
+                break;
         }
     }
 
@@ -67,9 +86,18 @@ export class CGame {
     private Render( time: number ) {
         this.m_context.clearRect( 0 , 0 , this.m_canvas.width , this.m_canvas.height );
 
-        this.m_blockHandler.Render();
-        this.m_landingArea.Render();
-        this.m_backgroundHandler.Render();
+        switch( this.m_gameState ) {
+            case GameState.MENU:
+                this.m_menu.Render();
+                break;
+            case GameState.GAME:
+                this.m_blockHandler.Render();
+                this.m_landingArea.Render();
+                this.m_backgroundHandler.Render();    
+                break;
+            default: 
+                break;
+        }
     }
 
     private Loop = ( time: number ) => {

@@ -26,12 +26,26 @@ export interface LadingArea extends Block {
     hit(): void;
 }
 
-export interface Score {
+export interface Text {
     x: number;
     y: number;
     width: number;
     height: number;
     currentString: string;
-    currentNumber: number;
     color: string;
+}
+
+export interface Score extends Text {
+    currentNumber: number;
+}
+
+export enum MenuStates {
+    MENU = 0,
+    CREDITS,
+    GAME,
+    NONE
+}
+
+export interface MenuOption extends Text {
+    state: MenuStates
 }
